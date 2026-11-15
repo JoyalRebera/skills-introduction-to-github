@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Interactive Page</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      padding: 24px; font-family: Arial, sans-serif;
+      background: #f1f5f9; color: #172033; transition: .2s;
+    }
+    .card {
+      width: min(100%, 440px); padding: 28px; border-radius: 18px;
+      background: white; box-shadow: 0 12px 35px #17203318;
+    }
+    h1 { margin: 0 0 8px; }
+    p { color: #64748b; line-height: 1.5; }
+    .counter { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 24px 0; }
+    #count { min-width: 48px; text-align: center; font-size: 2.5rem; font-weight: 700; }
+    button {
+      border: 0; border-radius: 10px; padding: 11px 16px; cursor: pointer;
+      background: #2563eb; color: white; font-size: 15px;
+    }
+    button.secondary { background: #e2e8f0; color: #172033; }
+    button:hover { filter: brightness(.95); }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .divider { border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+    .task-form { display: flex; gap: 8px; }
+    input {
+      flex: 1; min-width: 0; padding: 11px 12px; border: 1px solid #cbd5e1;
+      border-radius: 10px; font-size: 15px;
+    }
+    ul { padding: 0; list-style: none; }
+    li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    li span { flex: 1; overflow-wrap: anywhere; }
+    li.done span { text-decoration: line-through; color: #94a3b8; }
+    .delete { padding: 6px 10px; background: #fee2e2; color: #b91c1c; }
+    body.dark { background: #0f172a; color: #e2e8f0; }
+    body.dark .card { background: #1e293b; }
+    body.dark p { color: #cbd5e1; }
+    body.dark .divider, body.dark li { border-color: #334155; }
+    body.dark input { background: #0f172a; border-color: #475569; color: white; }
+    body.dark button.secondary { background: #334155; color: #e2e8f0; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Hello there 👋</h1>
+    <p>A small interactive page with a counter, a task list, and a theme switch.</p>
+
+    <h2 style="text-align:center">Counter</h2>
+    <div class="counter">
+      <button class="secondary" id="decrease" aria-label="Decrease counter">−</button>
+      <output id="count" aria-live="polite">0</output>
+      <button id="increase" aria-label="Increase counter">+</button>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="reset">Reset counter</button>
+      <button class="secondary" id="theme">🌙 Toggle theme</button>
+    </div>
+
+    <hr class="divider" />
+    <h2>My tasks</h2>
+    <form class="task-form" id="taskForm">
+      <input id="taskInput" type="text" placeholder="Enter a task..." aria-label="New task" />
+      <button type="submit">Add</button>
+    </form>
+    <ul id="taskList"></ul>
+  </main>
+
+  <script>
+    let count = 0;
+    const countOutput = document.getElementById('count');
+
+    function updateCounter() {
+      countOutput.textContent = count;
+    }
+
+    document.getElementById('increase').addEventListener('click', () => {
+      count++;
+      updateCounter();
+    });
+
+    document.getElementById('decrease').addEventListener('click', () => {
+      count--;
+      updateCounter();
+    });
+
+    document.getElementById('reset').addEventListener('click', () => {
+      count = 0;
+      updateCounter();
+    });
+
+    document.getElementById('theme').addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+
+    const taskForm = document.getElementById('taskForm');
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+
+    taskForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const taskText = taskInput.value.trim();
+      if (!taskText) {
+        taskInput.focus();
+        return;
+      }
+
+      const item = document.createElement('li');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.setAttribute('aria-label', 'Mark task complete');
+
+      const label = document.createElement('span');
+      label.textContent = taskText;
+
+      const deleteButton = document.createElement('button');
+      deleteButton.type = 'button';
+      deleteButton.className = 'delete';
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', () => item.remove());
+
+      checkbox.addEventListener('change', () => {
+        item.classList.toggle('done', checkbox.checked);
+      });
+
+      item.append(checkbox, label, deleteButton);
+      taskList.append(item);
+      taskInput.value = '';
+      taskInput.focus();
+    });
+  </script>
+</body>
+</html>
